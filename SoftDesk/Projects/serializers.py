@@ -7,28 +7,42 @@ from rest_framework import serializers
 class ProjectSerializer(serializers):
     class Meta:
         model = Project
-        fields = ["name", "date_created", "date_upated"]
+        fields = [
+            "name",
+            "date_created",
+            "date_upated",
+        ]
 
 
 class IssueSerializer(serializers):
     class Meta:
         model = Issue
-        fields = ["name"]
+        fields = [
+            "name",
+        ]
 
 
 class CommentSerializer(serializers):
     class Meta:
         model = Comment
-        fields = ["name"]
+        fields = [
+            "name",
+        ]
 
 
 class ContributorSerializer(serializers):
     class Meta:
         model = Contributor
-        fields = ["username"]
+        fields = [
+            "username",
+        ]
 
 
 class UserSerializer(serializers):
     class Meta:
         model = AnyUser
-        fields = ["username", "email", "age"]
+        fields = [
+            "username",
+            "email",
+            "age",
+        ]
