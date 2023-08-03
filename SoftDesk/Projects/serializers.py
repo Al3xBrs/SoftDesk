@@ -1,48 +1,61 @@
 from Users.models import Contributor, AnyUser
 from Projects.models import Project, Issue, Comment
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 
-class ProjectSerializer(serializers):
+class ProjectSerializer(ModelSerializer):
     class Meta:
         model = Project
         fields = [
             "name",
             "date_created",
-            "date_upated",
+            "description",
+            "type",
+            "author",
+            "contributors",
         ]
 
 
-class IssueSerializer(serializers):
+class IssueSerializer(ModelSerializer):
     class Meta:
         model = Issue
         fields = [
             "name",
+            "author",
+            "affected_to",
+            "status",
+            "priority",
+            "tag",
+            "description",
+            "date_created",
         ]
 
 
-class CommentSerializer(serializers):
+class CommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
         fields = [
-            "name",
+            "comment",
+            "author",
+            "date_created",
         ]
 
 
-class ContributorSerializer(serializers):
+class ContributorSerializer(ModelSerializer):
     class Meta:
         model = Contributor
         fields = [
             "username",
+            "email",
         ]
 
 
-class UserSerializer(serializers):
+class UserSerializer(ModelSerializer):
     class Meta:
         model = AnyUser
         fields = [
             "username",
             "email",
-            "age",
+            "date_of_birth",
         ]
