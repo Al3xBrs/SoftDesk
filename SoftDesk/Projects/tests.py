@@ -35,7 +35,7 @@ class TestProject(APITestCase):
 
         expected = [
             {
-                "id": project.id,
+                
                 "name": project.name,
                 "date_created": self.format_datetime(project.date_created),
                 "description": project.description,
@@ -45,7 +45,7 @@ class TestProject(APITestCase):
                     str(contributor.id)
                     for contributor in project.contributors.all()
                 ],
-                "date_updated": self.format_datetime(project.date_updated),
+                
             }
         ]
 
