@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "softdesk"
+version = "0.1.0"
+description = "Projet_10-OC"
+authors = ["Alex Brs <alexbrise.40@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+django = "^4.2.4"
+djangorestframework = "^3.14.0"
+markdown = "^3.4.4"
+django-filter = "^23.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
