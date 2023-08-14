@@ -2,28 +2,41 @@ from django.db import models
 from Users.models import Contributor, AnyUser
 
 
-class Comment(models.Model):
-    """
-    Comment on the project's issue.
-    Contributor automaticly add at the creation.
-    """
-
-    comment = models.CharField(
-        max_length=1000,
+class Project(models.Model):
+    name = models.CharField(
+        max_length=50,
     )
-    contributor = models.ForeignKey(
-        Contributor,
-        on_delete=models.CASCADE,
+    description = models.CharField(
+        max_length=1200,
+        blank=True,
         null=True,
+    )
+    type_choices = [
+        ("BE", "Back-end"),
+        ("FE", "Front-end"),
+        ("IO", "IOS"),
+        ("AN", "Android"),
+    ]
+    type = models.CharField(
+        max_length=2,
+        choices=type_choices,
+    )
+    author = models.ForeignKey(
+        AnyUser,
+        related_name="project_author",
+        on_delete=models.CASCADE,
+    )
+    contributors = models.ManyToManyField(
+        Contributor,
+        related_name="project_contributors",
+        symmetrical=False,
         blank=True,
     )
     date_created = models.DateTimeField(
         auto_now_add=True,
     )
-    author = models.ForeignKey(
-        Contributor,
-        on_delete=models.CASCADE,
-        related_name="comment_author",
+    date_updated = models.DateTimeField(
+        auto_now=True,
     )
 
 
@@ -86,51 +99,45 @@ class Issue(models.Model):
         blank=True,
     )
 
-    comments = models.ForeignKey(
-        to=Comment,
+    date_created = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    project = models.ForeignKey(
+        to=Project,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
 
+
+class Comment(models.Model):
+    """
+    Comment on the project's issue.
+    Contributor automaticly add at the creation.
+    """
+
+    comment = models.CharField(
+        max_length=1000,
+    )
+    contributor = models.ForeignKey(
+        Contributor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     date_created = models.DateTimeField(
         auto_now_add=True,
-    )
-
-
-class Project(models.Model):
-    name = models.CharField(
-        max_length=50,
-    )
-    description = models.CharField(
-        max_length=1200,
-        blank=True,
-        null=True,
-    )
-    type_choices = [
-        ("BE", "Back-end"),
-        ("FE", "Front-end"),
-        ("IO", "IOS"),
-        ("AN", "Android"),
-    ]
-    type = models.CharField(
-        max_length=2,
-        choices=type_choices,
     )
     author = models.ForeignKey(
-        AnyUser,
-        related_name="project_author",
-        on_delete=models.CASCADE,
-    )
-    contributors = models.ManyToManyField(
         Contributor,
-        related_name="project_contributors",
-        symmetrical=False,
+        on_delete=models.CASCADE,
+        related_name="comment_author",
+    )
+
+    issue = models.ForeignKey(
+        to=Issue,
+        on_delete=models.CASCADE,
         blank=True,
-    )
-    date_created = models.DateTimeField(
-        auto_now_add=True,
-    )
-    date_updated = models.DateTimeField(
-        auto_now=True,
+        null=True,
     )

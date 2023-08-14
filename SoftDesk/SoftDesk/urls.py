@@ -20,16 +20,17 @@ from Projects.views import ProjectViewset, IssueViewset, CommentViewset
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from Projects.urls import router as projects_router
 
-router = routers.SimpleRouter()
-router.register("project", ProjectViewset, basename="project")
-router.register("issue", IssueViewset, basename="issue")
-router.register("comment", CommentViewset, basename="comment")
+router = routers.DefaultRouter()
+router.registry.extend(projects_router.registry)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="obtain_tokens"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh_token"),
-    path("api/", include(router.urls)),
+    path("api/", include(router.urls), name="api_home"),
+    path("dj-rest-auth/", include("dj_rest_auth.urls")),
 ]
