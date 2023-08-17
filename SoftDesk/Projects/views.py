@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from Projects.permissions import isContributorAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from Projects.models import Project, Issue, Comment
 from Projects.serializers import (
     ProjectSerializer,

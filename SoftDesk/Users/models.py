@@ -1,11 +1,51 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.forms import forms
 from uuid import uuid4
 from datetime import date
 
 
+class AnyUserManager(BaseUserManager):
+    def create_user(self, email, username, password, date_of_birth):
+        if not email:
+            raise ValueError("Users must have an email address")
+        if not username:
+            raise ValueError("Users must have a username")
+
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username,
+            password=password,
+            date_of_birth=date_of_birth,
+        )
+
+        user.set_password(password)
+
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password, username, date_of_birth):
+        """
+        Creates and saves a superuser with the given email and password.
+        """
+        user = self.create_user(
+            email,
+            password=password,
+            username=username,
+            date_of_birth=date_of_birth,
+        )
+        user.staff = True
+        user.admin = True
+        user.save(using=self._db)
+        return user
+
+    def get_by_natural_key(self, username):
+        return self.get(username=username)
+
+
 class AnyUser(AbstractBaseUser):
+    objects = AnyUserManager()
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     email = models.EmailField(
         verbose_name="email address",
@@ -24,7 +64,7 @@ class AnyUser(AbstractBaseUser):
     )
 
     def age_verification(self):
-        dob = self.cleaned_data["date_of_birth"]
+        dob = self.date_of_birth
         today = date.today
         if (dob.year + 15, dob.month, dob.day) > (
             today.year,
@@ -54,11 +94,14 @@ class AnyUser(AbstractBaseUser):
     is_admin = models.BooleanField(
         default=False,
     )
+    is_staff = models.BooleanField(
+        default=False,
+    )
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = [
         "email",
-        "age",
+        "date_of_birth",
     ]
 
 
