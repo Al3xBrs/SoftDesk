@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.forms import forms
 from uuid import uuid4
 from datetime import date
+from django.contrib.auth.models import PermissionsMixin
 
 
 class AnyUserManager(BaseUserManager):
@@ -29,13 +30,15 @@ class AnyUserManager(BaseUserManager):
         Creates and saves a superuser with the given email and password.
         """
         user = self.create_user(
-            email,
+            email=email,
             password=password,
             username=username,
             date_of_birth=date_of_birth,
         )
-        user.staff = True
-        user.admin = True
+        user.is_staff = True
+        user.is_admin = True
+        user.is_superuser = True
+
         user.save(using=self._db)
         return user
 
@@ -43,7 +46,7 @@ class AnyUserManager(BaseUserManager):
         return self.get(username=username)
 
 
-class AnyUser(AbstractBaseUser):
+class AnyUser(AbstractBaseUser, PermissionsMixin):
     objects = AnyUserManager()
 
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -95,6 +98,9 @@ class AnyUser(AbstractBaseUser):
         default=False,
     )
     is_staff = models.BooleanField(
+        default=False,
+    )
+    is_superuser = models.BooleanField(
         default=False,
     )
 

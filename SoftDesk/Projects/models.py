@@ -1,5 +1,6 @@
 from django.db import models
 from Users.models import Contributor, AnyUser
+from Projects.permissions import isContributorAuthenticated
 
 
 class Project(models.Model):
@@ -26,8 +27,9 @@ class Project(models.Model):
         related_name="project_author",
         on_delete=models.CASCADE,
     )
+
     contributors = models.ManyToManyField(
-        Contributor,
+        to=AnyUser,
         related_name="project_contributors",
         symmetrical=False,
         blank=True,
