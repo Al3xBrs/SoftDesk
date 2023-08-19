@@ -1,5 +1,5 @@
 from django.db import models
-from Users.models import Contributor, AnyUser
+from Users.models import AnyUser
 from Projects.permissions import isContributorAuthenticated
 
 
@@ -56,17 +56,17 @@ class Issue(models.Model):
     )
 
     author = models.ForeignKey(
-        Contributor,
+        AnyUser,
         on_delete=models.CASCADE,
         related_name="issue_author",
     )
 
     affected_to = models.ForeignKey(
-        Contributor,
+        AnyUser,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        related_name="affected_contributor",
+        related_name="affected_AnyUser",
     )
     status_chocies = [
         ("OP", "Open"),
@@ -123,7 +123,7 @@ class Comment(models.Model):
         max_length=1000,
     )
     contributor = models.ForeignKey(
-        Contributor,
+        AnyUser,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -132,7 +132,7 @@ class Comment(models.Model):
         auto_now_add=True,
     )
     author = models.ForeignKey(
-        Contributor,
+        AnyUser,
         on_delete=models.CASCADE,
         related_name="comment_author",
     )
@@ -143,3 +143,8 @@ class Comment(models.Model):
         blank=True,
         null=True,
     )
+
+
+class Contribution(models.Model):
+    user = models.ForeignKey(AnyUser, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)

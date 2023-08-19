@@ -6,5 +6,6 @@ class isContributorAuthenticated(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and request.user.is_contributor
+            # TODO : A checker
+            # and request.user.is_contributor
         )

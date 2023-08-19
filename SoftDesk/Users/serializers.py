@@ -1,6 +1,13 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from Users.models import AnyUser
+from Projects.models import Contribution
+
+
+class ContributionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contribution
+        fields = "__all__"
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -28,7 +35,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnyUser
-        fields = "__all__"
+        fields = [
+            "username",
+            "email",
+            "date_of_birth",
+            "password",
+            "password2",
+        ]
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:

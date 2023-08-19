@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from Projects.permissions import isContributorAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.views import generics
 from Projects.models import Project, Issue, Comment
 from Projects.serializers import (
     ProjectSerializer,
@@ -16,7 +18,6 @@ class ProjectViewset(ReadOnlyModelViewSet):
     filterset_fields = [
         "type",
         "author",
-        "contributors",
     ]
     search_fields = [
         "name",
@@ -25,6 +26,12 @@ class ProjectViewset(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Project.objects.all()
+
+
+class ProjectRegisterView(generics.CreateAPIView):
+    queryset = Project.objects.all()
+    permission_classes = (isContributorAuthenticated,)
+    serializer_class = ProjectSerializer
 
 
 class IssueViewset(ReadOnlyModelViewSet):

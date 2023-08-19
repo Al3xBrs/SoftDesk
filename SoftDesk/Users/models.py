@@ -82,9 +82,6 @@ class AnyUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(
         default=True,
     )
-    is_contributor = models.BooleanField(
-        default=False,
-    )
 
     can_be_contacted = models.BooleanField(
         default=False,
@@ -109,16 +106,3 @@ class AnyUser(AbstractBaseUser, PermissionsMixin):
         "email",
         "date_of_birth",
     ]
-
-
-class Contributor(models.Model):
-    username = models.CharField(
-        verbose_name="username",
-        unique=True,
-        max_length=50,
-    )
-    email = models.EmailField(
-        verbose_name="email address",
-        max_length=100,
-        unique=True,
-    )
