@@ -28,17 +28,24 @@ class Project(models.Model):
         on_delete=models.CASCADE,
     )
 
-    contributors = models.ManyToManyField(
-        to=AnyUser,
-        related_name="project_contributors",
-        symmetrical=False,
-        blank=True,
-    )
     date_created = models.DateTimeField(
         auto_now_add=True,
     )
     date_updated = models.DateTimeField(
         auto_now=True,
+    )
+
+
+class Contribution(models.Model):
+    user = models.ForeignKey(
+        AnyUser,
+        on_delete=models.CASCADE,
+        related_name="contributor",
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="project",
     )
 
 
@@ -62,29 +69,29 @@ class Issue(models.Model):
     )
 
     affected_to = models.ForeignKey(
-        AnyUser,
+        Contribution,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name="affected_AnyUser",
     )
-    status_chocies = [
+    status_choices = [
         ("OP", "Open"),
         ("IP", "In Progress"),
         ("CL", "Closed"),
     ]
     status = models.CharField(
         max_length=2,
-        choices=status_chocies,
+        choices=status_choices,
     )
-    priority_chocies = [
+    priority_choices = [
         ("HI", "High"),
         ("ME", "Medium"),
         ("LO", "Low"),
     ]
     priority = models.CharField(
         max_length=2,
-        choices=priority_chocies,
+        choices=priority_choices,
     )
     tag_choices = [
         ("BU", "Bug"),
@@ -122,12 +129,7 @@ class Comment(models.Model):
     comment = models.CharField(
         max_length=1000,
     )
-    contributor = models.ForeignKey(
-        AnyUser,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
+
     date_created = models.DateTimeField(
         auto_now_add=True,
     )
@@ -143,8 +145,3 @@ class Comment(models.Model):
         blank=True,
         null=True,
     )
-
-
-class Contribution(models.Model):
-    user = models.ForeignKey(AnyUser, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)

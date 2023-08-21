@@ -1,65 +1,71 @@
-from Users.models import AnyUser
 from Projects.models import Project, Issue, Comment, Contribution
-
-from rest_framework.serializers import ModelSerializer
+from Users.models import AnyUser
+from rest_framework.serializers import ModelSerializer, StringRelatedField, ChoiceField
 
 
 class ContributionSerializer(ModelSerializer):
     class Meta:
         model = Contribution
         fields = [
-            "username",
-            "email",
+            "user",
+            "project",
         ]
 
 
 class ProjectSerializer(ModelSerializer):
+    author = StringRelatedField(
+        source="author.username",
+    )
     contributions = ContributionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = [
-            "name",
+        fields = "__all__"
+        read_only_fields = (
+            "author",
             "date_created",
-            "description",
-            "type",
-            "contributions",
-        ]
-
-    def create(self, validated_data):
-        project = Project.objects.create(
-            name=validated_data["name"],
-            description=validated_data["description"],
-            type=validated_data["type"],
-            author=self.context["request"].user,
+            "date_updated",
         )
-        project.save()
-        return project
 
 
 class IssueSerializer(ModelSerializer):
+    author = StringRelatedField(
+        source="author.username",
+    )
+    status = ChoiceField(
+        choices=Issue.status_choices,
+        source="get_status_display",
+    )
+    priority = ChoiceField(
+        choices=Issue.priority_choices,
+        source="get_priority_display",
+    )
+    tag = ChoiceField(
+        choices=Issue.tag_choices,
+        source="get_tag_display",
+    )
+
     class Meta:
         model = Issue
-        fields = [
-            "name",
+        fields = "__all__"
+        read_only_fields = (
             "author",
-            "affected_to",
-            "status",
-            "priority",
-            "tag",
-            "description",
             "date_created",
-        ]
+        )
 
 
 class CommentSerializer(ModelSerializer):
+    author = StringRelatedField(
+        source="author.username",
+    )
+
     class Meta:
         model = Comment
-        fields = [
-            "comment",
+        fields = "__all__"
+        read_only_fields = (
             "author",
             "date_created",
-        ]
+        )
 
 
 class UserSerializer(ModelSerializer):

@@ -33,6 +33,27 @@ class ProjectRegisterView(generics.CreateAPIView):
     permission_classes = (isContributorAuthenticated,)
     serializer_class = ProjectSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class CommentRegisterView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    permission_classes = (isContributorAuthenticated,)
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class IssueRegisterView(generics.CreateAPIView):
+    queryset = Issue.objects.all()
+    permission_classes = (isContributorAuthenticated,)
+    serializer_class = IssueSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class IssueViewset(ReadOnlyModelViewSet):
     serializer_class = IssueSerializer

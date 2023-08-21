@@ -20,7 +20,7 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from Users.views import RegisterView, getProfile, updateProfile
-from Projects.views import ProjectRegisterView
+from Projects.views import ProjectRegisterView, CommentRegisterView, IssueRegisterView
 from Projects.urls import router as projects_router
 
 router = routers.DefaultRouter()
@@ -28,16 +28,61 @@ router.registry.extend(projects_router.registry)
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api-auth/", include("rest_framework.urls")),
-    path("api/token/", TokenObtainPairView.as_view(), name="obtain_tokens"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh_token"),
-    path("api/", include(router.urls), name="api_home"),
-    path("dj-rest-auth/", include("dj_rest_auth.urls")),
-    path("api/register/", RegisterView.as_view(), name="auth_register"),
     path(
-        "api/register/project/", ProjectRegisterView.as_view(), name="project_register"
+        "admin/",
+        admin.site.urls,
     ),
-    path("api/profile/", getProfile, name="profile"),
-    path("api/profile/update/", updateProfile, name="update-profile"),
+    path(
+        "api-auth/",
+        include("rest_framework.urls"),
+    ),
+    path(
+        "api/token/",
+        TokenObtainPairView.as_view(),
+        name="obtain_tokens",
+    ),
+    path(
+        "api/token/refresh/",
+        TokenRefreshView.as_view(),
+        name="refresh_token",
+    ),
+    path(
+        "api/",
+        include(router.urls),
+        name="api_home",
+    ),
+    path(
+        "dj-rest-auth/",
+        include("dj_rest_auth.urls"),
+    ),
+    path(
+        "api/register/",
+        RegisterView.as_view(),
+        name="auth_register",
+    ),
+    path(
+        "api/register/project/",
+        ProjectRegisterView.as_view(),
+        name="project_register",
+    ),
+    path(
+        "api/register/issue/",
+        IssueRegisterView.as_view(),
+        name="issue_register",
+    ),
+    path(
+        "api/register/comment/",
+        CommentRegisterView.as_view(),
+        name="comment_register",
+    ),
+    path(
+        "api/profile/",
+        getProfile,
+        name="profile",
+    ),
+    path(
+        "api/profile/update/",
+        updateProfile,
+        name="update-profile",
+    ),
 ]
