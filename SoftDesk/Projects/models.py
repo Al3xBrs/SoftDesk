@@ -1,6 +1,5 @@
 from django.db import models
 from Users.models import AnyUser
-from Projects.permissions import isContributorAuthenticated
 
 
 class Project(models.Model):
@@ -34,6 +33,9 @@ class Project(models.Model):
     date_updated = models.DateTimeField(
         auto_now=True,
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Contribution(models.Model):

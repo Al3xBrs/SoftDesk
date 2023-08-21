@@ -1,11 +1,12 @@
 from rest_framework.permissions import BasePermission
+from Projects.models import Contribution
 
 
 class isContributorAuthenticated(BasePermission):
     def has_permission(self, request, view):
-        return bool(
-            request.user
-            and request.user.is_authenticated
-            # TODO : A checker
-            # and request.user.is_contributor
-        )
+        user = request.user
+        print(request.data)
+        # TODO:
+        project = request.META["project_id"]
+        is_permitted = Contribution.objects.filter(user=user).exists()
+        return is_permitted

@@ -1,15 +1,36 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import (
+    IsAuthenticated,
+    AllowAny,
+)
 from Projects.permissions import isContributorAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+)
 from rest_framework_simplejwt.views import generics
-from Projects.models import Project, Issue, Comment
+from Projects.models import (
+    Project,
+    Issue,
+    Comment,
+    Contribution,
+)
 from Projects.serializers import (
     ProjectSerializer,
     IssueSerializer,
     CommentSerializer,
+    ContributionSerializer,
 )
+
+
+class ContributionRegisterView(generics.CreateAPIView):
+    queryset = Contribution.objects.all()
+    serializer_class = ContributionSerializer
+    permission_classes = (AllowAny,)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class ProjectViewset(ReadOnlyModelViewSet):

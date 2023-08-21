@@ -1,22 +1,35 @@
-from Projects.models import Project, Issue, Comment, Contribution
+from Projects.models import (
+    Project,
+    Issue,
+    Comment,
+    Contribution,
+)
 from Users.models import AnyUser
-from rest_framework.serializers import ModelSerializer, StringRelatedField, ChoiceField
+from rest_framework.serializers import (
+    ModelSerializer,
+    StringRelatedField,
+)
 
 
 class ContributionSerializer(ModelSerializer):
+    user = StringRelatedField(
+        source="user.name",
+    )
+
     class Meta:
         model = Contribution
-        fields = [
-            "user",
-            "project",
-        ]
+        fields = "__all__"
+        read_only_fields = ("user",)
 
 
 class ProjectSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    contributions = ContributionSerializer(many=True, read_only=True)
+    """     type = ChoiceField(
+        choices=Project.type_choices,
+        source="get_type_display",
+    ) """
 
     class Meta:
         model = Project
@@ -32,7 +45,7 @@ class IssueSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    status = ChoiceField(
+    """     status = ChoiceField(
         choices=Issue.status_choices,
         source="get_status_display",
     )
@@ -43,7 +56,7 @@ class IssueSerializer(ModelSerializer):
     tag = ChoiceField(
         choices=Issue.tag_choices,
         source="get_tag_display",
-    )
+    ) """
 
     class Meta:
         model = Issue

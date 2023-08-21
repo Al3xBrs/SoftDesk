@@ -18,9 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from Users.views import RegisterView, getProfile, updateProfile
-from Projects.views import ProjectRegisterView, CommentRegisterView, IssueRegisterView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from Users.views import (
+    RegisterView,
+    getProfile,
+    updateProfile,
+)
+from Projects.views import (
+    ProjectRegisterView,
+    CommentRegisterView,
+    IssueRegisterView,
+    ContributionRegisterView,
+)
 from Projects.urls import router as projects_router
 
 router = routers.DefaultRouter()
@@ -84,5 +96,10 @@ urlpatterns = [
         "api/profile/update/",
         updateProfile,
         name="update-profile",
+    ),
+    path(
+        "api/register/contribution/",
+        ContributionRegisterView.as_view(),
+        name="contribution_register",
     ),
 ]
