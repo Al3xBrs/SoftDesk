@@ -119,6 +119,7 @@ class Issue(models.Model):
         on_delete=models.CASCADE,
         blank=True,
         null=True,
+        related_name="project_issue",
     )
 
 

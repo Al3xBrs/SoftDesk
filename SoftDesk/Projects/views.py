@@ -35,7 +35,7 @@ class ContributionRegisterView(generics.CreateAPIView):
 
 class ProjectViewset(ReadOnlyModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     filterset_fields = [
         "type",
         "author",
@@ -51,7 +51,7 @@ class ProjectViewset(ReadOnlyModelViewSet):
 
 class ProjectRegisterView(generics.CreateAPIView):
     queryset = Project.objects.all()
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = ProjectSerializer
 
     def perform_create(self, serializer):
@@ -60,7 +60,7 @@ class ProjectRegisterView(generics.CreateAPIView):
 
 class CommentRegisterView(generics.CreateAPIView):
     queryset = Comment.objects.all()
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
@@ -69,7 +69,7 @@ class CommentRegisterView(generics.CreateAPIView):
 
 class IssueRegisterView(generics.CreateAPIView):
     queryset = Issue.objects.all()
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = IssueSerializer
 
     def perform_create(self, serializer):
@@ -78,7 +78,7 @@ class IssueRegisterView(generics.CreateAPIView):
 
 class IssueViewset(ReadOnlyModelViewSet):
     serializer_class = IssueSerializer
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     filterset_fields = [
         "author",
         "affected_to",
@@ -92,12 +92,16 @@ class IssueViewset(ReadOnlyModelViewSet):
     ]
 
     def get_queryset(self):
-        return Issue.objects.all()
+        user = self.request.user
+        user_contributions = Contribution.objects.filter(user=user)
+        project_ids = [contribution.project.id for contribution in user_contributions]
+
+        return Issue.objects.filter(project__id__in=project_ids)
 
 
 class CommentViewset(ReadOnlyModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (isContributorAuthenticated,)
+    permission_classes = (AllowAny,)
     filterset_fields = [
         "author",
     ]
@@ -106,4 +110,10 @@ class CommentViewset(ReadOnlyModelViewSet):
     ]
 
     def get_queryset(self):
-        return Comment.objects.all()
+        user = self.request.user
+        user_contributions = Contribution.objects.filter(user=user)
+        project_ids = [contribution.project.id for contribution in user_contributions]
+
+        issue_ids = Issue.objects.filter(project__id__in=project_ids)
+
+        return Comment.objects.filter(issue__id__in=issue_ids)
