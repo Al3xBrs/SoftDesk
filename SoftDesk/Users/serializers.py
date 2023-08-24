@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from Users.models import AnyUser
 from Projects.models import Contribution
+from datetime import date
 
 
 class ContributionSerializer(serializers.ModelSerializer):
@@ -41,12 +42,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             "date_of_birth",
             "password",
             "password2",
+            "can_be_contacted",
+            "can_data_be_shared",
         ]
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match."}
+            )
+
+        dob = attrs["date_of_birth"]
+        today = date.today()
+        if (dob.year + 15, dob.month, dob.day) > (
+            today.year,
+            today.month,
+            today.day,
+        ):
+            raise serializers.ValidationError(
+                "Vous devez être agé d'au moins 15 ans pour vous inscrire."
             )
 
         return attrs
@@ -56,6 +70,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"],
             date_of_birth=validated_data["date_of_birth"],
+            can_be_contacted=validated_data["can_be_contacted"],
+            can_data_be_shared=validated_data["can_data_be_shared"],
         )
         user.set_password(validated_data["password"])
         user.save()

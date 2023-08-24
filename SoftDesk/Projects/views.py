@@ -27,7 +27,7 @@ from Projects.serializers import (
 class ContributionRegisterView(generics.CreateAPIView):
     queryset = Contribution.objects.all()
     serializer_class = ContributionSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -35,7 +35,7 @@ class ContributionRegisterView(generics.CreateAPIView):
 
 class ProjectViewset(ReadOnlyModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     filterset_fields = [
         "type",
         "author",
@@ -44,24 +44,38 @@ class ProjectViewset(ReadOnlyModelViewSet):
         "name",
         "description",
     ]
+    fields = "__all__"
 
     def get_queryset(self):
-        return Project.objects.all()
+        user = self.request.user
+        user_contributions = Contribution.objects.filter(user=user)
+        project_ids = [contribution.project.id for contribution in user_contributions]
+
+        return Project.objects.filter(id__in=project_ids)
 
 
 class ProjectRegisterView(generics.CreateAPIView):
     queryset = Project.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = ProjectSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        project = serializer.save(author=self.request.user)
+        contribution = Contribution.objects.create(
+            user=self.request.user, project=project
+        )
+        contribution.save()
 
 
 class CommentRegisterView(generics.CreateAPIView):
     queryset = Comment.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = CommentSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -69,8 +83,13 @@ class CommentRegisterView(generics.CreateAPIView):
 
 class IssueRegisterView(generics.CreateAPIView):
     queryset = Issue.objects.all()
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = IssueSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -78,7 +97,7 @@ class IssueRegisterView(generics.CreateAPIView):
 
 class IssueViewset(ReadOnlyModelViewSet):
     serializer_class = IssueSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     filterset_fields = [
         "author",
         "affected_to",
@@ -91,6 +110,11 @@ class IssueViewset(ReadOnlyModelViewSet):
         "description",
     ]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
+
     def get_queryset(self):
         user = self.request.user
         user_contributions = Contribution.objects.filter(user=user)
@@ -101,13 +125,18 @@ class IssueViewset(ReadOnlyModelViewSet):
 
 class CommentViewset(ReadOnlyModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     filterset_fields = [
         "author",
     ]
     search_fields = [
         "comment",
     ]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["user"] = self.request.user
+        return context
 
     def get_queryset(self):
         user = self.request.user

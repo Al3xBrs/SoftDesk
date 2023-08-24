@@ -1,5 +1,7 @@
 from django.db import models
 from Users.models import AnyUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Project(models.Model):
@@ -49,6 +51,9 @@ class Contribution(models.Model):
         on_delete=models.CASCADE,
         related_name="project",
     )
+
+    def __str__(self):
+        return f"Projet : {self.project.name} - Contributeur : {self.user.username}"
 
 
 class Issue(models.Model):
@@ -122,6 +127,9 @@ class Issue(models.Model):
         related_name="project_issue",
     )
 
+    def __str__(self):
+        return f"Projet : {self.project.name} - Issue : {self.name}"
+
 
 class Comment(models.Model):
     """
@@ -148,3 +156,6 @@ class Comment(models.Model):
         blank=True,
         null=True,
     )
+
+    def __str__(self):
+        return f"Issue : {self.issue.name}"

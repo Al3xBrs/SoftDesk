@@ -8,6 +8,9 @@ from Users.models import AnyUser
 from rest_framework.serializers import (
     ModelSerializer,
     StringRelatedField,
+    SlugRelatedField,
+    ValidationError,
+    SerializerMethodField,
 )
 
 
@@ -26,10 +29,6 @@ class ProjectSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    """     type = ChoiceField(
-        choices=Project.type_choices,
-        source="get_type_display",
-    ) """
 
     class Meta:
         model = Project
@@ -45,18 +44,7 @@ class IssueSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    """     status = ChoiceField(
-        choices=Issue.status_choices,
-        source="get_status_display",
-    )
-    priority = ChoiceField(
-        choices=Issue.priority_choices,
-        source="get_priority_display",
-    )
-    tag = ChoiceField(
-        choices=Issue.tag_choices,
-        source="get_tag_display",
-    ) """
+    # project = SerializerMethodField()
 
     class Meta:
         model = Issue
@@ -66,11 +54,27 @@ class IssueSerializer(ModelSerializer):
             "date_created",
         )
 
+    # def get_project(self, instance):
+    #     project = instance.project
+    #     if project:
+    #         return project.name
+    #     return None
+
+    def get_fields(self):
+        fields = super().get_fields()
+        contributions = Contribution.objects.filter(user=self.context["user"])
+        users_contributors = [contribution.user for contribution in contributions]
+        project_ids = [contribution.project.id for contribution in contributions]
+        fields["project"].queryset = Project.objects.filter(id__in=project_ids)
+        fields["affected_to"].queryset = users_contributors
+        return fields
+
 
 class CommentSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
+    issue = SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -79,6 +83,19 @@ class CommentSerializer(ModelSerializer):
             "author",
             "date_created",
         )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        contributions = Contribution.objects.filter(user=self.context["user"])
+        project_ids = [contribution.project.id for contribution in contributions]
+        fields["issue"].queryset = Issue.objects.filter(project__id__in=project_ids)
+        return fields
+
+    def get_issue(self, instance):
+        issue = instance.issue
+        if issue:
+            return issue.name
+        return None
 
 
 class UserSerializer(ModelSerializer):

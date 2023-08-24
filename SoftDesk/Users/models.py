@@ -66,19 +66,6 @@ class AnyUser(AbstractBaseUser, PermissionsMixin):
         "user dob",
     )
 
-    def age_verification(self):
-        dob = self.date_of_birth
-        today = date.today
-        if (dob.year + 15, dob.month, dob.day) > (
-            today.year,
-            today.month,
-            today.day,
-        ):
-            raise forms.ValidationError(
-                "Vous devez être agé d'au moins 15 ans pour vous inscrire."
-            )
-        return dob
-
     is_active = models.BooleanField(
         default=True,
     )
