@@ -48,10 +48,8 @@ class DeleteUserDataView(APIView):
     def delete(self, request, *args, **kwargs):
         user = self.request.user
 
-        # Supprime toutes les données liées à l'utilisateur
         Contribution.objects.filter(user=user).delete()
         Issue.objects.filter(author=user).delete()
         Comment.objects.filter(author=user).delete()
-        # Ajoute d'autres modèles à supprimer si nécessaire
 
         return Response({"message": "User data deleted successfully."})

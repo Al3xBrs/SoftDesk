@@ -8,10 +8,6 @@ from Users.models import AnyUser
 from rest_framework.serializers import (
     ModelSerializer,
     StringRelatedField,
-    SlugRelatedField,
-    ValidationError,
-    SerializerMethodField,
-    PrimaryKeyRelatedField,
 )
 
 
