@@ -11,6 +11,7 @@ from rest_framework.serializers import (
     SlugRelatedField,
     ValidationError,
     SerializerMethodField,
+    PrimaryKeyRelatedField,
 )
 
 
@@ -44,7 +45,6 @@ class IssueSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    # project = SerializerMethodField()
 
     class Meta:
         model = Issue
@@ -52,29 +52,14 @@ class IssueSerializer(ModelSerializer):
         read_only_fields = (
             "author",
             "date_created",
+            "project",
         )
-
-    # def get_project(self, instance):
-    #     project = instance.project
-    #     if project:
-    #         return project.name
-    #     return None
-
-    def get_fields(self):
-        fields = super().get_fields()
-        contributions = Contribution.objects.filter(user=self.context["user"])
-        users_contributors = [contribution.user for contribution in contributions]
-        project_ids = [contribution.project.id for contribution in contributions]
-        fields["project"].queryset = Project.objects.filter(id__in=project_ids)
-        fields["affected_to"].queryset = users_contributors
-        return fields
 
 
 class CommentSerializer(ModelSerializer):
     author = StringRelatedField(
         source="author.username",
     )
-    issue = SerializerMethodField()
 
     class Meta:
         model = Comment
@@ -82,20 +67,8 @@ class CommentSerializer(ModelSerializer):
         read_only_fields = (
             "author",
             "date_created",
+            "issue",
         )
-
-    def get_fields(self):
-        fields = super().get_fields()
-        contributions = Contribution.objects.filter(user=self.context["user"])
-        project_ids = [contribution.project.id for contribution in contributions]
-        fields["issue"].queryset = Issue.objects.filter(project__id__in=project_ids)
-        return fields
-
-    def get_issue(self, instance):
-        issue = instance.issue
-        if issue:
-            return issue.name
-        return None
 
 
 class UserSerializer(ModelSerializer):

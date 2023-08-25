@@ -41,7 +41,7 @@ class Project(models.Model):
 
 
 class Contribution(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         AnyUser,
         on_delete=models.CASCADE,
         related_name="contributor",
@@ -53,7 +53,7 @@ class Contribution(models.Model):
     )
 
     def __str__(self):
-        return f"Projet : {self.project.name} - Contributeur : {self.user.username}"
+        return f"{self.user.username}"
 
 
 class Issue(models.Model):

@@ -32,6 +32,12 @@ from Projects.views import (
     CommentRegisterView,
     IssueRegisterView,
     ContributionRegisterView,
+    ProjectDeleteView,
+    ProjectUpdateView,
+    IssueDeleteView,
+    IssueUpdateView,
+    CommentDeleteView,
+    CommentUpdateView,
 )
 from Projects.urls import router as projects_router
 
@@ -68,7 +74,7 @@ urlpatterns = [
         include("dj_rest_auth.urls"),
     ),
     path(
-        "api/register/",
+        "api/register/user/",
         RegisterView.as_view(),
         name="auth_register",
     ),
@@ -78,12 +84,12 @@ urlpatterns = [
         name="project_register",
     ),
     path(
-        "api/register/issue/",
+        "api/project/<int:project_id>/register/issue/",
         IssueRegisterView.as_view(),
         name="issue_register",
     ),
     path(
-        "api/register/comment/",
+        "api/issue/<int:issue_id>/register/comment/",
         CommentRegisterView.as_view(),
         name="comment_register",
     ),
@@ -101,5 +107,35 @@ urlpatterns = [
         "api/register/contribution/",
         ContributionRegisterView.as_view(),
         name="contribution_register",
+    ),
+    path(
+        "api/delete/project/<int:pk>/",
+        ProjectDeleteView.as_view(),
+        name="delete_project",
+    ),
+    path(
+        "api/update/project/<int:pk>/",
+        ProjectUpdateView.as_view(),
+        name="update_project",
+    ),
+    path(
+        "api/delete/issue/<int:pk>/",
+        IssueDeleteView.as_view(),
+        name="delete_Issue",
+    ),
+    path(
+        "api/update/issue/<int:pk>/",
+        IssueUpdateView.as_view(),
+        name="update_Issue",
+    ),
+    path(
+        "api/delete/comment/<int:pk>/",
+        CommentDeleteView.as_view(),
+        name="delete_comment",
+    ),
+    path(
+        "api/update/comment/<int:pk>/",
+        CommentUpdateView.as_view(),
+        name="update_comment",
     ),
 ]

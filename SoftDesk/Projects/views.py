@@ -3,7 +3,7 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny,
 )
-from Projects.permissions import isContributorAuthenticated
+from Projects.permissions import isContributorAuthenticated, isAuthor
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import (
     api_view,
@@ -49,7 +49,7 @@ class ProjectViewset(ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         user_contributions = Contribution.objects.filter(user=user)
-        project_ids = [contribution.project.id for contribution in user_contributions]
+        project_ids = [contribution.project.pk for contribution in user_contributions]
 
         return Project.objects.filter(id__in=project_ids)
 
@@ -67,32 +67,81 @@ class ProjectRegisterView(generics.CreateAPIView):
         contribution.save()
 
 
+class ProjectDeleteView(generics.DestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
+class ProjectUpdateView(generics.UpdateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
+class IssueDeleteView(generics.DestroyAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
+class IssueUpdateView(generics.UpdateAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
+class CommentDeleteView(generics.DestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
+class CommentUpdateView(generics.UpdateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [
+        isAuthor,
+    ]
+
+
 class CommentRegisterView(generics.CreateAPIView):
     queryset = Comment.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = CommentSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["user"] = self.request.user
-        return context
-
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        issue_id = self.kwargs.get("issue_id")
+        issue = Issue.objects.get(pk=issue_id)
+        serializer.save(
+            author=self.request.user,
+            issue=issue,
+        )
 
 
 class IssueRegisterView(generics.CreateAPIView):
     queryset = Issue.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = isAuthor
     serializer_class = IssueSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["user"] = self.request.user
-        return context
-
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        project_id = self.kwargs.get("project_id")
+        project = Project.objects.get(pk=project_id)
+
+        serializer.save(
+            author=self.request.user,
+            project=project,
+        )
 
 
 class IssueViewset(ReadOnlyModelViewSet):
@@ -118,7 +167,7 @@ class IssueViewset(ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         user_contributions = Contribution.objects.filter(user=user)
-        project_ids = [contribution.project.id for contribution in user_contributions]
+        project_ids = [contribution.project.pk for contribution in user_contributions]
 
         return Issue.objects.filter(project__id__in=project_ids)
 
@@ -141,7 +190,7 @@ class CommentViewset(ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         user_contributions = Contribution.objects.filter(user=user)
-        project_ids = [contribution.project.id for contribution in user_contributions]
+        project_ids = [contribution.project.pk for contribution in user_contributions]
 
         issue_ids = Issue.objects.filter(project__id__in=project_ids)
 
