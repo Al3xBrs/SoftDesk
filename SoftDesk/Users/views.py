@@ -5,9 +5,11 @@ from Users.serializers import (
     RegisterSerializer,
     ProfileSerializer,
 )
+from Projects.models import Contribution, Issue, Comment
 from Users.models import AnyUser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.views import APIView
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -38,3 +40,18 @@ def updateProfile(request):
     if serializer.is_valid():
         serializer.save()
     return Response(serializer.data)
+
+
+class DeleteUserDataView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user
+
+        # Supprime toutes les données liées à l'utilisateur
+        Contribution.objects.filter(user=user).delete()
+        Issue.objects.filter(author=user).delete()
+        Comment.objects.filter(author=user).delete()
+        # Ajoute d'autres modèles à supprimer si nécessaire
+
+        return Response({"message": "User data deleted successfully."})

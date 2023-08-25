@@ -2,6 +2,7 @@ from django.db import models
 from Users.models import AnyUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from uuid import uuid4
 
 
 class Project(models.Model):
@@ -137,6 +138,7 @@ class Comment(models.Model):
     Contributor automaticly add at the creation.
     """
 
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     comment = models.CharField(
         max_length=1000,
     )

@@ -26,6 +26,7 @@ from Users.views import (
     RegisterView,
     getProfile,
     updateProfile,
+    DeleteUserDataView,
 )
 from Projects.views import (
     ProjectRegisterView,
@@ -77,6 +78,9 @@ urlpatterns = [
         "api/register/user/",
         RegisterView.as_view(),
         name="auth_register",
+    ),
+    path(
+        "api/delete-user-data/", DeleteUserDataView.as_view(), name="delete_data_user"
     ),
     path(
         "api/register/project/",
