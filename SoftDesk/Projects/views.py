@@ -1,7 +1,7 @@
 from rest_framework.permissions import (
     IsAuthenticated,
 )
-from Projects.permissions import isAuthor
+from Projects.permissions import isAuthor, isContributorAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import (
     permission_classes,
@@ -128,7 +128,7 @@ class CommentRegisterView(generics.CreateAPIView):
 
 class IssueRegisterView(generics.CreateAPIView):
     queryset = Issue.objects.all()
-    permission_classes = isAuthor
+    permission_classes = (isContributorAuthenticated,)
     serializer_class = IssueSerializer
 
     def perform_create(self, serializer):

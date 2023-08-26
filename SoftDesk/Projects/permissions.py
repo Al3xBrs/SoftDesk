@@ -10,7 +10,7 @@ class isContributorAuthenticated(BasePermission):
         user = request.user
 
         project_id = view.kwargs.get(
-            "pk",
+            "project_id",
         )
         is_permitted = Contribution.objects.filter(
             user=user, project_id=project_id
